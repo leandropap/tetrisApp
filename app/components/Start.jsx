@@ -1,6 +1,6 @@
 export default function Start({ cb }) {
 
     return (
-        <button className="" >Start</button>
+        <button className="border border-white px-2 flex items-center font-bold">START</ button>
     )
 } 
