@@ -4,7 +4,7 @@ import Display from "./Display"
 import Start from "./Start"
 import { useState } from "react"
 import { usePlayer, useStage } from "../helpers/hooks"
-import { createStage } from "../helpers/helpers"
+import { createStage, checkColilision } from "../helpers/helpers"
 
 
 export default function Tetris() {
@@ -13,8 +13,12 @@ export default function Tetris() {
     const [player, updatePlayerPos, resetPlayer] = usePlayer()
     const [stage, setStage] = useStage(player)
 
+    console.log(player)
+
     function movePlayer(dir) {
-        updatePlayerPos({ x: dir, y: 0 })
+        if (!checkColilision(player, stage, { x: dir, y: 0 })) {
+            updatePlayerPos({ x: dir, y: 0 })
+        }
     }
 
     function startGame() {
@@ -30,9 +34,9 @@ export default function Tetris() {
         drop()
     }
 
-    function move({ key }) {
+    function move({ keyCode }) {
         if (!gameOver) {
-            switch (key) {
+            switch (keyCode) {
                 case 37:
                     movePlayer(-1)
                     break
@@ -56,7 +60,7 @@ export default function Tetris() {
                             <Display text='SCORE' />
                             <Display text='ROWS' />
                             <Display text="LEVEL" />
-                            <Start onClick={startGame} />
+                            <Start cb={() => startGame()} />
                         </aside>
                     </div>
                 </div>

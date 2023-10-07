@@ -1,30 +1,28 @@
 import { useState, useCallback, useEffect } from "react";
-import { randomTetrominos, createStage, STAGE_WIDTH } from "./helpers";
+import { randomTetrominos, createStage, STAGE_WIDTH, TETROMINOS } from "./helpers";
 
 function usePlayer() {
     const [player, setPlayer] = useState({
         pos: { x: 0, y: 0 },
-        tetromino: randomTetrominos().shape,
-        collition: false
+        tetromino: TETROMINOS[0].shape,
+        collision: false
     })
 
-    function updatePlayerPos({ x, y, collition }) {
+    function updatePlayerPos({ x, y, collision }) {
         setPlayer(prev => ({
             ...prev,
             pos: { x: (prev.pos.x += x), y: (prev.pos.y += y) },
-            collition
+            collision
         }))
     }
 
-    function resetPlayer(player, resetPlayer) {
-        useCallback(() => {
-            setPlayer({
-                pos: { x: ((STAGE_WIDTH / 2) - 2), y: 0 },
-                tetromino: randomTetrominos().shape,
-                collition: false
-            })
-        }, [])
-    }
+    const resetPlayer = useCallback(() => {
+        setPlayer({
+            pos: { x: STAGE_WIDTH / 2 - 2, y: 0 },
+            tetromino: randomTetrominos().shape,
+            collision: false
+        })
+    })
 
     return [player, updatePlayerPos, resetPlayer]
 }
@@ -42,15 +40,18 @@ function useStage(player, resetPlayer) {
                 row.forEach((value, x) => {
                     if (value !== 0) {
                         newStage[y + player.pos.y][x + player.pos.x] =
-                            [value, `${player.collition ? 'merged' : 'clear'}`]
+                            [value, `${player.collision ? 'merged' : 'clear'}`]
                     }
                 })
-            });
 
+            });
+            if (player.collision) {
+                resetPlayer()
+            }
             return newStage
         }
         setStage(prev => updateStage(prev))
-    }, [player.collition, player.pos.x, player.pos.y, player.tetromino])
+    }, [player])
 
     return [stage, setStage]
 }
